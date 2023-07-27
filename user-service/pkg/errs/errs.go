@@ -164,3 +164,16 @@ func (k Kind) String() string {
 	}
 	return "unknown error kind"
 }
+
+func KindIs(kind Kind, err error) bool {
+	var e *Error
+	if errors.As(err, &e) {
+		if e.Kind != Other {
+			return e.Kind == kind
+		}
+		if e.Err != nil {
+			return KindIs(kind, e.Err)
+		}
+	}
+	return false
+}

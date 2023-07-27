@@ -13,6 +13,11 @@ type SingUpRequest struct {
 	Password string `json:"password" binging:"required"`
 }
 
+type SingInRequest struct {
+	Email    string `json:"email" binging:"required"`
+	Password string `json:"password" binging:"required"`
+}
+
 func (h *Handler) singUp(ctx *gin.Context) {
 	var request SingUpRequest
 
@@ -36,5 +41,19 @@ func (h *Handler) singUp(ctx *gin.Context) {
 }
 
 func (h *Handler) singIn(ctx *gin.Context) {
+	var request SingInRequest
 
+	if err := ctx.BindJSON(&request); err != nil {
+		newHTTPErrorResponse(ctx, errs.NewError(errs.Validation, err))
+		return
+	}
+	id, err := h.services.Authorization.GenerateToken(request.Email, request.Password)
+	if err != nil {
+		newHTTPErrorResponse(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, map[string]interface{}{
+		"token": id,
+	})
 }

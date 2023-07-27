@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
 	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/errs"
 	"gorm.io/gorm"
@@ -34,4 +35,16 @@ func (ap *AuthPostgres) CreateUser(user userService.User) (uint, error) {
 
 	tx.Commit()
 	return user.ID, result.Error
+}
+
+func (ap *AuthPostgres) GetUserByEmailAndPassword(email, password string) (userService.User, error) {
+	var user userService.User
+	err := ap.db.Where("email = ? AND password_hash = ?", email, password).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return user, errs.NewError(errs.NotExist, "User not found")
+	}
+	if err != nil {
+		return user, err
+	}
+	return userService.User{}, nil
 }

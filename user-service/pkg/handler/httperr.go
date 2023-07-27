@@ -97,7 +97,7 @@ func unknownHTTPErrorResponse(ctx *gin.Context, e error) {
 			Message: "Unexpected error - contact support",
 		},
 	}
-	logrus.Errorf("Unxpected error: %v", e)
+	logrus.Errorf("Unxpected error: %+v", e)
 	ctx.AbortWithStatusJSON(http.StatusInternalServerError, er)
 }
 
