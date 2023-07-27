@@ -46,5 +46,17 @@ func (ap *AuthPostgres) GetUserByEmailAndPassword(email, password string) (userS
 	if err != nil {
 		return user, err
 	}
-	return userService.User{}, nil
+	return user, nil
+}
+
+func (ap *AuthPostgres) GetUserById(id uint) (userService.User, error) {
+	var user userService.User
+	err := ap.db.Where("id = ?", id).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return user, errs.NewError(errs.NotExist, "User not found")
+	}
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }

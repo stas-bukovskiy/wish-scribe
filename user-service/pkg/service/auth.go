@@ -65,3 +65,27 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 
 	return token.SignedString([]byte(singingKey))
 }
+
+func (s *AuthService) ParseToken(tokenToParse string) (userService.User, error) {
+	token, err := jwt.ParseWithClaims(tokenToParse, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errs.NewError(errs.Unauthorized, "Invalid signing method")
+		}
+
+		return []byte(singingKey), nil
+	})
+	if err != nil {
+		return userService.User{}, errs.NewError(errs.Unauthorized, "Invalid access token")
+	}
+
+	claims, ok := token.Claims.(*tokenClaims)
+	if !ok {
+		return userService.User{}, errs.NewError(errs.Unauthorized, "Invalid access token")
+	}
+	userId := claims.UserId
+	user, err := s.repo.GetUserById(userId)
+	if err != nil {
+		return userService.User{}, errs.NewError(errs.Unauthorized, "Invalid access token")
+	}
+	return user, nil
+}
