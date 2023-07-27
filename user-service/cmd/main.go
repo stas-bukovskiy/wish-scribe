@@ -29,9 +29,13 @@ func main() {
 		SSLMode:  viper.GetBool("db.sslmode"),
 		TimeZone: viper.GetString("db.timezone"),
 	})
-
 	if err != nil {
 		log.Fatalf("error occurred while db connection: %s", err.Error())
+	}
+
+	err = db.AutoMigrate(&userService.User{})
+	if err != nil {
+		log.Fatalf("error occurred while db migration: %s", err.Error())
 	}
 
 	repos := repository.NewRepository(db)

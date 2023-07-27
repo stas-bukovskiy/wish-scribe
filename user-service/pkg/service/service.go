@@ -1,8 +1,12 @@
 package service
 
-import "github.com/stas-bukovskiy/wish-scribe/user-service/pkg/repository"
+import (
+	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/repository"
+)
 
 type Authorization interface {
+	CreateUser(user userService.User) (uint, error)
 }
 
 type Token interface {
@@ -18,5 +22,7 @@ type Service struct {
 }
 
 func NewService(repos *repository.Repository) *Service {
-	return &Service{}
+	return &Service{
+		Authorization: NewAuthService(repos.Authorization),
+	}
 }

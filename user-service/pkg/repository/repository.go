@@ -1,8 +1,12 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
+	"gorm.io/gorm"
+)
 
 type Authorization interface {
+	CreateUser(user userService.User) (uint, error)
 }
 
 type Token interface {
@@ -18,5 +22,7 @@ type Repository struct {
 }
 
 func NewRepository(db *gorm.DB) *Repository {
-	return &Repository{}
+	return &Repository{
+		Authorization: NewAuthPostgres(db),
+	}
 }
