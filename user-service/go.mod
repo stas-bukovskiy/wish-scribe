@@ -2,6 +2,8 @@ module github.com/stas-bukovskiy/wish-scribe/user-service
 
 go 1.20
 
+require github.com/pkg/errors v0.9.1
+
 require (
 	github.com/bytedance/sonic v1.10.0-rc3 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
