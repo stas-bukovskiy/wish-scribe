@@ -7,16 +7,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type AuthPostgres struct {
+type UserPostgres struct {
 	db *gorm.DB
 }
 
-func NewAuthPostgres(db *gorm.DB) *AuthPostgres {
-	return &AuthPostgres{db: db}
+func NewUserPostgres(db *gorm.DB) *UserPostgres {
+	return &UserPostgres{db: db}
 }
 
-func (ap *AuthPostgres) CreateUser(user userService.User) (uint, error) {
-	tx := ap.db.Begin()
+func (us *UserPostgres) CreateUser(user userService.User) (uint, error) {
+	tx := us.db.Begin()
 	var exists bool
 	err := tx.Model(&userService.User{}).Select("count(*) > 0").
 		Where("email = ?", user.Email).
@@ -37,9 +37,9 @@ func (ap *AuthPostgres) CreateUser(user userService.User) (uint, error) {
 	return user.ID, result.Error
 }
 
-func (ap *AuthPostgres) GetUserByEmailAndPassword(email, password string) (userService.User, error) {
+func (us *UserPostgres) GetUserByEmailAndPassword(email, password string) (userService.User, error) {
 	var user userService.User
-	err := ap.db.Where("email = ? AND password_hash = ?", email, password).First(&user).Error
+	err := us.db.Where("email = ? AND password_hash = ?", email, password).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return user, errs.NewError(errs.NotExist, "User not found")
 	}
@@ -49,9 +49,9 @@ func (ap *AuthPostgres) GetUserByEmailAndPassword(email, password string) (userS
 	return user, nil
 }
 
-func (ap *AuthPostgres) GetUserById(id uint) (userService.User, error) {
+func (us *UserPostgres) GetUserById(id uint) (userService.User, error) {
 	var user userService.User
-	err := ap.db.Where("id = ?", id).First(&user).Error
+	err := us.db.Where("id = ?", id).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return user, errs.NewError(errs.NotExist, "User not found")
 	}

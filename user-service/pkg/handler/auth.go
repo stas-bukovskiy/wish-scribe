@@ -25,7 +25,7 @@ func (h *Handler) singUp(ctx *gin.Context) {
 		newHTTPErrorResponse(ctx, errs.NewError(errs.Validation, err))
 		return
 	}
-	id, err := h.services.Authorization.CreateUser(userService.User{
+	id, err := h.services.User.CreateUser(userService.User{
 		Name:     request.Name,
 		Email:    request.Email,
 		Password: request.Password,

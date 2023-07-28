@@ -5,26 +5,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type Authorization interface {
+type User interface {
 	CreateUser(user userService.User) (uint, error)
 	GetUserByEmailAndPassword(email, password string) (userService.User, error)
 	GetUserById(id uint) (userService.User, error)
 }
 
-type Token interface {
-}
-
-type User interface {
-}
-
 type Repository struct {
-	Authorization
-	Token
 	User
 }
 
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
-		Authorization: NewAuthPostgres(db),
+		User: NewUserPostgres(db),
 	}
 }
