@@ -1,7 +1,7 @@
 package repository
 
 import (
-	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
+	userService "github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
 	"gorm.io/gorm"
 )
 

@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/stas-bukovskiy/wish-scribe/user-service/docs"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/service"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/service"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )

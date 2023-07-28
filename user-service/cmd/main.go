@@ -6,9 +6,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/handler"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/repository"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/service"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/handler"
+	repository2 "github.com/stas-bukovskiy/wish-scribe/user-service/internal/repository"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -33,7 +34,7 @@ func main() {
 		log.Fatalf("error occurred while env variables loading: %s", err.Error())
 	}
 
-	db, err := repository.NewPostgresDB(&repository.Config{
+	db, err := repository2.NewPostgresDB(&repository2.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
@@ -46,19 +47,19 @@ func main() {
 		log.Fatalf("error occurred while db connection: %s", err.Error())
 	}
 
-	err = db.AutoMigrate(&userService.User{})
+	err = db.AutoMigrate(&entity.User{})
 	if err != nil {
 		log.Fatalf("error occurred while db migration: %s", err.Error())
 	}
 
-	repos := repository.NewRepository(db)
+	repos := repository2.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
 	srv := new(userService.Server)
 	go func() {
 		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-			log.Fatalf("error occurred while running http server: %s", err.Error())
+			log.Fatalf("error occurred while running http httpserver: %s", err.Error())
 		}
 	}()
 

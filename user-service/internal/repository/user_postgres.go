@@ -2,7 +2,7 @@ package repository
 
 import (
 	"errors"
-	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
+	userService "github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
 	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/errs"
 	"gorm.io/gorm"
 )

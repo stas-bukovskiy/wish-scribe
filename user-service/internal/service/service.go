@@ -1,8 +1,8 @@
 package service
 
 import (
-	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/repository"
+	userService "github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/repository"
 )
 
 type Authorization interface {

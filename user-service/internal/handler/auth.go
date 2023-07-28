@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
+	userService "github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
 	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/errs"
 	"net/http"
 )

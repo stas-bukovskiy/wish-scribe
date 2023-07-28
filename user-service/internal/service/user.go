@@ -1,9 +1,9 @@
 package service
 
 import (
-	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
+	userService "github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/repository"
 	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/errs"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/repository"
 	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/utils"
 )
 
