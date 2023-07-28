@@ -18,6 +18,15 @@ type SingInRequest struct {
 	Password string `json:"password" binging:"required"`
 }
 
+// @Summary      Sign Up
+// @Description  Create a new user account
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param request body SingUpRequest true "account data"
+// @Success      200  {object}  userService.User
+// @Failure      404,500  {object}  ErrorResponse
+// @Router       /auth/sign-up [post]
 func (h *Handler) singUp(ctx *gin.Context) {
 	var request SingUpRequest
 
@@ -40,6 +49,15 @@ func (h *Handler) singUp(ctx *gin.Context) {
 	})
 }
 
+// @Summary      Sign In
+// @Description  Login and get access token
+// @Tags         auth
+// @Accept       */*
+// @Produce      json
+// @Param request body SingInRequest true "login data"
+// @Success      200  {string}  token
+// @Failure      404,500  {object}  ErrorResponse
+// @Router       /auth/sign-in [post]
 func (h *Handler) singIn(ctx *gin.Context) {
 	var request SingInRequest
 

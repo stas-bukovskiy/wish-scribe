@@ -14,6 +14,16 @@ import (
 	"syscall"
 )
 
+// @title           User Service API
+// @version         1.0
+// @description     This is service to authenticate users and verify their JWT tokens
+//
+// @host localhost:8000
+// @BathPath /
+//
+// @securityDefinitions.apikey  ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	if err := initConfigs(); err != nil {
 		log.Fatalf("error occurred while config initalizing: %s", err.Error())

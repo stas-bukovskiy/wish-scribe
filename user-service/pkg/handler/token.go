@@ -6,6 +6,15 @@ import (
 	"net/http"
 )
 
+// @Summary      Verify Token
+// @Description  Verify access token and get user info
+// @Tags         token
+// @Accept       */*
+// @Produce      json
+// @Param token path string true "token to verify"
+// @Success      200  {object}  user_service.User
+// @Failure      404,500  {object}  ErrorResponse
+// @Router       /api/v1/tokens/{token} [get]
 func (h *Handler) verifyToken(ctx *gin.Context) {
 	token := ctx.Param("token")
 	user, err := h.services.Authorization.ParseToken(token)
