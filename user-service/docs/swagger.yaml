@@ -1,0 +1,177 @@
+definitions:
+  handler.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/handler.ServiceError'
+    type: object
+  handler.ServiceError:
+    properties:
+      kind:
+        type: string
+      message:
+        type: string
+      param:
+        type: string
+    type: object
+  handler.SingInRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  handler.SingUpRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  user_service.User:
+    properties:
+      created_at:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: integer
+    type: object
+host: localhost:8000
+info:
+  contact: { }
+  description: This is service to authenticate users and verify their JWT tokens
+  title: User Service API
+  version: "1.0"
+paths:
+  /api/v1/tokens/{token}:
+    get:
+      consumes:
+        - '*/*'
+      description: Verify access token and get user info
+      parameters:
+        - description: token to verify
+          in: path
+          name: token
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user_service.User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Verify Token
+      tags:
+        - token
+  /api/v1/users/{id}:
+    get:
+      consumes:
+        - '*/*'
+      description: Get user info by its id
+      parameters:
+        - description: user id
+          in: path
+          name: id
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user_service.User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+        - ApiKeyAuth: [ ]
+      summary: Get By ID
+      tags:
+        - users
+  /auth/sign-in:
+    post:
+      consumes:
+        - '*/*'
+      description: Login and get access token
+      parameters:
+        - description: login data
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: '#/definitions/handler.SingInRequest'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Sign In
+      tags:
+        - auth
+  /auth/sign-up:
+    post:
+      consumes:
+        - application/json
+      description: Create a new user account
+      parameters:
+        - description: account data
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: '#/definitions/handler.SingUpRequest'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user_service.User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Sign Up
+      tags:
+        - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
