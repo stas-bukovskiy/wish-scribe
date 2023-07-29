@@ -1,10 +1,10 @@
 package service
 
 import (
-	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/errs"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/repository"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/utils"
+	"github.com/stas-bukovskiy/wish-scribe/packages/errs"
+	userService "github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/repository"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/validation"
 )
 
 type UserService struct {
@@ -12,7 +12,7 @@ type UserService struct {
 }
 
 func (s *UserService) CreateUser(user userService.User) (uint, error) {
-	if !utils.IsValidEmail(user.Email) {
+	if !validation.IsValidEmail(user.Email) {
 		return 0, errs.NewError(errs.Validation, "User email is not valid")
 	}
 	user.Password = generatePasswordHash(user.Password)

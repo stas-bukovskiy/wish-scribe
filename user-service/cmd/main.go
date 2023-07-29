@@ -1,14 +1,15 @@
 package main
 
 import (
-	"context"
 	"github.com/joho/godotenv"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/handler"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/repository"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/service"
+	"github.com/stas-bukovskiy/wish-scribe/packages/database"
+	"github.com/stas-bukovskiy/wish-scribe/packages/httpserver"
+	"github.com/stas-bukovskiy/wish-scribe/packages/logger"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/handler"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/repository"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -25,15 +26,16 @@ import (
 // @in header
 // @name Authorization
 func main() {
+	log := logger.New("INFO")
 	if err := initConfigs(); err != nil {
-		log.Fatalf("error occurred while config initalizing: %s", err.Error())
+		log.Fatal("error occurred while config initializing: %s", err.Error())
 	}
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("error occurred while env variables loading: %s", err.Error())
+		log.Fatal("error occurred while env variables loading: %s", err.Error())
 	}
 
-	db, err := repository.NewPostgresDB(&repository.Config{
+	db, err := database.NewPostgreSQL(database.PostgreSQLConfig{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
@@ -43,43 +45,34 @@ func main() {
 		TimeZone: viper.GetString("db.timezone"),
 	})
 	if err != nil {
-		log.Fatalf("error occurred while db connection: %s", err.Error())
+		log.Fatal("error occurred while db connection: %s", err.Error())
 	}
 
-	err = db.AutoMigrate(&userService.User{})
+	err = db.DB.AutoMigrate(&entity.User{})
 	if err != nil {
-		log.Fatalf("error occurred while db migration: %s", err.Error())
+		log.Fatal("error occurred while db migration: %s", err.Error())
 	}
 
-	repos := repository.NewRepository(db)
+	repos := repository.NewRepository(db.DB, log)
 	services := service.NewService(repos)
-	handlers := handler.NewHandler(services)
+	handlers := handler.NewHandler(services, log)
 
-	srv := new(userService.Server)
-	go func() {
-		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-			log.Fatalf("error occurred while running http server: %s", err.Error())
-		}
-	}()
+	srv := httpserver.New(handlers.InitRoutes(), httpserver.Port(viper.GetString("port")))
 
-	log.Printf("user-service has started")
+	log.Info("user-service has started")
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGHUP, syscall.SIGTERM)
 	<-quit
 
-	log.Printf("user-service shutting down")
+	log.Info("user-service shutting down")
 
-	if err := srv.Shutdown(context.Background()); err != nil {
-		log.Errorf("error occurred while shutting down: %s", err.Error())
+	if err := srv.Shutdown(); err != nil {
+		log.Error("error occurred while shutting down: %s", err.Error())
 	}
 
-	sqlDB, err := db.DB()
-	if err != nil {
-		log.Errorf("error occurred while getting sql db: %s", err.Error())
-	}
-	if err := sqlDB.Close(); err != nil {
-		log.Errorf("error occurred while shutting down: %s", err.Error())
+	if err := db.Close(); err != nil {
+		log.Error("error occurred while shutting down: %s", err.Error())
 	}
 }
 

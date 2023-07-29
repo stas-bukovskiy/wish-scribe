@@ -1,7 +1,8 @@
 package repository
 
 import (
-	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
+	"github.com/stas-bukovskiy/wish-scribe/packages/logger"
+	userService "github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
 	"gorm.io/gorm"
 )
 
@@ -15,8 +16,8 @@ type Repository struct {
 	User
 }
 
-func NewRepository(db *gorm.DB) *Repository {
+func NewRepository(db *gorm.DB, logger logger.Logger) *Repository {
 	return &Repository{
-		User: NewUserPostgres(db),
+		User: NewUserPostgres(db, logger),
 	}
 }

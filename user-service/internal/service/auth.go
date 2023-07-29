@@ -4,9 +4,9 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/errs"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/repository"
+	"github.com/stas-bukovskiy/wish-scribe/packages/errs"
+	userService "github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/repository"
 	"time"
 )
 
@@ -38,8 +38,8 @@ func generatePasswordHash(password string) string {
 func (s *AuthService) GenerateToken(email, password string) (string, error) {
 	user, err := s.repo.GetUserByEmailAndPassword(email, generatePasswordHash(password))
 	if err != nil {
-		if errs.KindIs(errs.NotExist, err) {
-			return "", errs.NewError(errs.Unanticipated, "Invalid email or password")
+		if errs.KindIs(errs.NotFound, err) {
+			return "", errs.NewError(errs.Unauthorized, "Invalid email or password")
 		}
 		return "", err
 	}

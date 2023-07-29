@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/errs"
+	"github.com/stas-bukovskiy/wish-scribe/packages/errs"
 	"net/http"
 )
 
@@ -16,13 +16,14 @@ import (
 // @Failure      404,500  {object}  ErrorResponse
 // @Router       /api/v1/tokens/{token} [get]
 func (h *Handler) verifyToken(ctx *gin.Context) {
+	log := h.logger.Named("verifyToken")
 	token := ctx.Param("token")
 	user, err := h.services.Authorization.ParseToken(token)
 	if err != nil {
 		if errs.KindIs(errs.Unauthorized, err) {
-			newHTTPErrorResponse(ctx, errs.NewError(errs.NotExist, "Invalid access token"))
+			errs.NewHTTPErrorResponse(ctx, log, errs.NewError(errs.BadRequest, "Invalid access token"))
 		}
-		newHTTPErrorResponse(ctx, err)
+		errs.NewHTTPErrorResponse(ctx, log, err)
 		return
 	}
 
