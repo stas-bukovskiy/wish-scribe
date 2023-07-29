@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"github.com/stas-bukovskiy/wish-scribe/packages/database"
@@ -28,11 +29,11 @@ import (
 func main() {
 	log := logger.New("INFO")
 	if err := initConfigs(); err != nil {
-		log.Fatal("error occurred while config initializing: %s", err.Error())
+		log.Fatal(fmt.Sprintf("error occurred while config initializing: %s", err.Error()))
 	}
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("error occurred while env variables loading: %s", err.Error())
+		log.Fatal(fmt.Sprintf("error occurred while env variables loading: %s", err.Error()))
 	}
 
 	db, err := database.NewPostgreSQL(database.PostgreSQLConfig{
@@ -45,12 +46,12 @@ func main() {
 		TimeZone: viper.GetString("db.timezone"),
 	})
 	if err != nil {
-		log.Fatal("error occurred while db connection: %s", err.Error())
+		log.Fatal(fmt.Sprintf("error occurred while db connection: %s", err.Error()))
 	}
 
 	err = db.DB.AutoMigrate(&entity.User{})
 	if err != nil {
-		log.Fatal("error occurred while db migration: %s", err.Error())
+		log.Fatal(fmt.Sprintf("error occurred while db migration: %s", err.Error()))
 	}
 
 	repos := repository.NewRepository(db.DB, log)

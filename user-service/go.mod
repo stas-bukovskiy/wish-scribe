@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/viper v1.16.0
-	github.com/stas-bukovskiy/wish-scribe/packages v0.0.0-20230729114142-1b0c69997c48
+	github.com/stas-bukovskiy/wish-scribe/packages v0.0.0-20230729130303-6b5553f87c19
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
