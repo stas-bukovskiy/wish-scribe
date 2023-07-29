@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/stas-bukovskiy/wish-scribe/packages/errs"
 	userService "github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
-	"github.com/stas-bukovskiy/wish-scribe/user-service/pkg/errs"
 	"net/http"
 )
 
@@ -27,11 +27,12 @@ type SingInRequest struct {
 // @Success      200  {object}  userService.User
 // @Failure      404,500  {object}  ErrorResponse
 // @Router       /auth/sign-up [post]
-func (h *Handler) singUp(ctx *gin.Context) {
+func (h *Handler) signUp(ctx *gin.Context) {
+	log := h.logger.Named("signUp")
 	var request SingUpRequest
 
 	if err := ctx.BindJSON(&request); err != nil {
-		newHTTPErrorResponse(ctx, errs.NewError(errs.Validation, err))
+		errs.NewHTTPErrorResponse(ctx, log, errs.NewError(errs.Validation, err))
 		return
 	}
 	id, err := h.services.User.CreateUser(userService.User{
@@ -40,7 +41,7 @@ func (h *Handler) singUp(ctx *gin.Context) {
 		Password: request.Password,
 	})
 	if err != nil {
-		newHTTPErrorResponse(ctx, err)
+		errs.NewHTTPErrorResponse(ctx, log, err)
 		return
 	}
 
@@ -58,16 +59,18 @@ func (h *Handler) singUp(ctx *gin.Context) {
 // @Success      200  {string}  token
 // @Failure      404,500  {object}  ErrorResponse
 // @Router       /auth/sign-in [post]
-func (h *Handler) singIn(ctx *gin.Context) {
+func (h *Handler) signIn(ctx *gin.Context) {
+	log := h.logger.Named("signIn")
+
 	var request SingInRequest
 
 	if err := ctx.BindJSON(&request); err != nil {
-		newHTTPErrorResponse(ctx, errs.NewError(errs.Validation, err))
+		errs.NewHTTPErrorResponse(ctx, log, errs.NewError(errs.Validation, err))
 		return
 	}
 	id, err := h.services.Authorization.GenerateToken(request.Email, request.Password)
 	if err != nil {
-		newHTTPErrorResponse(ctx, err)
+		errs.NewHTTPErrorResponse(ctx, log, err)
 		return
 	}
 

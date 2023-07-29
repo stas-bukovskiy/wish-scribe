@@ -27,7 +27,6 @@ import (
 // @name Authorization
 func main() {
 	log := logger.New("INFO")
-
 	if err := initConfigs(); err != nil {
 		log.Fatal("error occurred while config initializing: %s", err.Error())
 	}
@@ -54,9 +53,9 @@ func main() {
 		log.Fatal("error occurred while db migration: %s", err.Error())
 	}
 
-	repos := repository.NewRepository(db.DB)
+	repos := repository.NewRepository(db.DB, log)
 	services := service.NewService(repos)
-	handlers := handler.NewHandler(services)
+	handlers := handler.NewHandler(services, log)
 
 	srv := httpserver.New(handlers.InitRoutes(), httpserver.Port(viper.GetString("port")))
 
