@@ -3,11 +3,12 @@ package main
 import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
+	"github.com/stas-bukovskiy/wish-scribe/packages/database"
 	"github.com/stas-bukovskiy/wish-scribe/packages/httpserver"
 	"github.com/stas-bukovskiy/wish-scribe/packages/logger"
 	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
 	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/handler"
-	repository2 "github.com/stas-bukovskiy/wish-scribe/user-service/internal/repository"
+	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/repository"
 	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/service"
 	"os"
 	"os/signal"
@@ -35,7 +36,7 @@ func main() {
 		log.Fatal("error occurred while env variables loading: %s", err.Error())
 	}
 
-	db, err := repository2.NewPostgresDB(&repository2.Config{
+	db, err := database.NewPostgreSQL(database.PostgreSQLConfig{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
@@ -48,12 +49,12 @@ func main() {
 		log.Fatal("error occurred while db connection: %s", err.Error())
 	}
 
-	err = db.AutoMigrate(&entity.User{})
+	err = db.DB.AutoMigrate(&entity.User{})
 	if err != nil {
 		log.Fatal("error occurred while db migration: %s", err.Error())
 	}
 
-	repos := repository2.NewRepository(db)
+	repos := repository.NewRepository(db.DB)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
@@ -71,11 +72,7 @@ func main() {
 		log.Error("error occurred while shutting down: %s", err.Error())
 	}
 
-	sqlDB, err := db.DB()
-	if err != nil {
-		log.Error("error occurred while getting sql db: %s", err.Error())
-	}
-	if err := sqlDB.Close(); err != nil {
+	if err := db.Close(); err != nil {
 		log.Error("error occurred while shutting down: %s", err.Error())
 	}
 }
