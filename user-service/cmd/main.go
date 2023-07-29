@@ -1,11 +1,10 @@
 package main
 
 import (
-	"context"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
+	"github.com/stas-bukovskiy/wish-scribe/packages/httpserver"
 	"github.com/stas-bukovskiy/wish-scribe/packages/logger"
-	userService "github.com/stas-bukovskiy/wish-scribe/user-service"
 	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/entity"
 	"github.com/stas-bukovskiy/wish-scribe/user-service/internal/handler"
 	repository2 "github.com/stas-bukovskiy/wish-scribe/user-service/internal/repository"
@@ -58,12 +57,7 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
-	srv := new(userService.Server)
-	go func() {
-		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-			log.Fatal("error occurred while running http httpserver: %s", err.Error())
-		}
-	}()
+	srv := httpserver.New(handlers.InitRoutes(), httpserver.Port(viper.GetString("port")))
 
 	log.Info("user-service has started")
 
@@ -73,7 +67,7 @@ func main() {
 
 	log.Info("user-service shutting down")
 
-	if err := srv.Shutdown(context.Background()); err != nil {
+	if err := srv.Shutdown(); err != nil {
 		log.Error("error occurred while shutting down: %s", err.Error())
 	}
 
