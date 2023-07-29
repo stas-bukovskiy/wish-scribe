@@ -22,6 +22,7 @@ func (h *Handler) verifyToken(ctx *gin.Context) {
 	if err != nil {
 		if errs.KindIs(errs.Unauthorized, err) {
 			errs.NewHTTPErrorResponse(ctx, log, errs.NewError(errs.BadRequest, "Invalid access token"))
+			return
 		}
 		errs.NewHTTPErrorResponse(ctx, log, err)
 		return
