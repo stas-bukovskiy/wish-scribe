@@ -27,6 +27,7 @@ func NewHTTPErrorResponse(ctx *gin.Context, log logger.Logger, err error) {
 	var e *Error
 	if errors.As(err, &e) {
 		typicalHTTPErrorResponse(ctx, log, e)
+		return
 	}
 
 	unknownHTTPErrorResponse(ctx, log, err)
