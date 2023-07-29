@@ -152,9 +152,7 @@ func (k Kind) String() string {
 func KindIs(kind Kind, err error) bool {
 	var e *Error
 	if errors.As(err, &e) {
-		if e.Err != nil {
-			return KindIs(kind, e.Err)
-		}
+		return kind == e.Kind
 	}
 	return false
 }
