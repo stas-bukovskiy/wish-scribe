@@ -13,10 +13,20 @@ import (
 
 // PostgreSQLConfig - represents PostgreSQL service config.
 type PostgreSQLConfig struct {
-	User     string
-	Password string
 	Host     string
-	Database string
+	Port     string
+	Username string
+	Password string
+	DBName   string
+	SSLMode  bool
+	TimeZone string
+}
+
+func (c *PostgreSQLConfig) getSSLMode() string {
+	if c.SSLMode {
+		return "enable"
+	}
+	return "disable"
 }
 
 // PostgreSQL - represents postgresql service.
@@ -61,7 +71,7 @@ func SetConnMaxLifetime(maxLifetime time.Duration) Option {
 }
 
 // NewPostgreSQL - creates new instance of PostgreSQL service.
-func NewPostgreSQL(cfg PostgreSQLConfig, opts ...Option) (*PostgreSQL, error) {
+func NewPostgreSQL(config PostgreSQLConfig, opts ...Option) (*PostgreSQL, error) {
 	// create instance of postgresql
 	sql := &PostgreSQL{}
 
@@ -72,10 +82,9 @@ func NewPostgreSQL(cfg PostgreSQLConfig, opts ...Option) (*PostgreSQL, error) {
 
 	// connect to database
 	var err error
-	dsn := fmt.Sprintf(
-		"user=%s password=%s dbname=%s host=%s",
-		cfg.User, cfg.Password, cfg.Database, cfg.Host,
-	)
+	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s TimeZone=%s",
+		config.Username, config.Password, config.DBName, config.Host, config.Port, config.getSSLMode(), config.TimeZone)
+
 	sql.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		PrepareStmt: true,
 	})
